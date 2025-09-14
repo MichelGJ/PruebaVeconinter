@@ -1,0 +1,84 @@
+﻿@model VeconinterContacts.Models.Cliente
+@using System.Linq
+@{
+    ViewData["Title"] = "Eliminar cliente";
+
+    var subs = (Model?.SubClientes ?? Enumerable.Empty<VeconinterContacts.Models.SubCliente>()).ToList();
+    var subsCount = subs.Count;
+    var hasSubs = subsCount > 0;
+    var confirmMsg = $"¿Eliminar definitivamente el cliente '{Model?.Nombre}'" + (hasSubs ? " y todos sus subclientes?" : "?");
+}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex align-items-center gap-2">
+        <span class="badge text-bg-danger">Eliminar</span>
+        <h5 class="m-0">Cliente</h5>
+    </div>
+
+    <div class="card-body">
+        <div class="alert alert-danger" role="alert">
+            <strong>Acción permanente:</strong>
+            <span>Se eliminará el cliente <strong>@Model?.Nombre</strong></span>
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3">Nombre</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Nombre)</dd>
+
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Email)</dd>
+
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Telefono)</dd>
+
+            <dt class="col-sm-3">Empresa</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Empresa)</dd>
+        </dl>
+
+        <hr />
+
+        <h6 class="mb-3">Subclientes (@subsCount)</h6>
+
+        @if (hasSubs)
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in subs)
+                        {
+                            <tr>
+                                <td>@s.Nombre</td>
+                                <td>@s.Email</td>
+                                <td>@s.Telefono</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-danger mt-3 mb-0" role="alert">
+                También se eliminarán los <strong>@subsCount</strong> subclientes listados.
+            </div>
+        }
+        else
+        {
+            <div class="text-muted">Este cliente no tiene subclientes.</div>
+        }
+    </div>
+
+    <div class="card-footer bg-white d-flex gap-2">
+        <form asp-action="Delete" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+            <button type="submit" class="btn btn-danger js-delete" data-message="@confirmMsg">
+                Sí, eliminar
+            </button>
+        </form>
+        <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+    </div>
+</div>

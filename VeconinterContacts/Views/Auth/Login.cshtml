@@ -1,0 +1,39 @@
+﻿@model VeconinterContacts.ViewModels.LoginVm
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    var returnUrl = (string?)ViewData["ReturnUrl"] ?? "/";
+}
+
+<div class="login-card">
+    <div class="text-center mb-4">
+        <img src="~/images/logo-veconinter.png" alt="Veconinter Logo" class="img-fluid" style="max-height: 80px;">
+    </div>
+
+    <form method="post" asp-action="Login" asp-route-returnUrl="@returnUrl">
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" placeholder="ejemplo@correo.com" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="********" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <button class="btn btn-primary w-100">Ingresar</button>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-3 text-center">
+                Credenciales inválidas
+            </div>
+        }
+    </form>
+
+    <p class="text-center text-muted mt-3" style="font-size:0.9rem;">
+        © @DateTime.Now.Year Veconinter - Gestión de Clientes
+    </p>
+</div>

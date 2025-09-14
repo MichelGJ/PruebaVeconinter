@@ -1,0 +1,73 @@
+﻿@{
+    var formSelector = (string?)ViewData["FormSelector"] ?? "form[data-validate='live']";
+    var selectorJson = System.Text.Json.JsonSerializer.Serialize(formSelector);
+}
+<script>
+    (function () {
+      var selector = @Html.Raw(selectorJson);
+      var $forms = $(selector);
+      if (!$forms.length || !window.jQuery || !$.fn.validate) return;
+
+      document.addEventListener("invalid", function (e) { e.preventDefault(); }, true);
+      $forms.attr("novalidate", "novalidate");
+
+      $forms.each(function () {
+        var $form = $(this);
+
+        if ($.validator.unobtrusive && $.validator.unobtrusive.parse) {
+          $.validator.unobtrusive.parse($form);
+        }
+
+        var extraRules = {}, extraMessages = {};
+        $form.find("input, select, textarea").each(function () {
+          var el = this, name = el.name;
+          if (!name) return;
+
+          var r = {}, m = extraMessages[name] || {};
+          if (el.hasAttribute("required") || el.hasAttribute("data-val-required")) {
+            r.required = true;
+            m.required = m.required || el.getAttribute("data-val-required") || "Este campo es obligatorio.";
+          }
+          var mx = el.getAttribute("maxlength") || el.getAttribute("data-val-length-max");
+          if (mx) {
+            r.maxlength = parseInt(mx, 10);
+            m.maxlength = m.maxlength || ("Máximo " + mx + " caracteres.");
+          }
+          var mn = el.getAttribute("minlength") || el.getAttribute("data-val-length-min");
+          if (mn) {
+            r.minlength = parseInt(mn, 10);
+            m.minlength = m.minlength || ("Mínimo " + mn + " caracteres.");
+          }
+          var type = (el.getAttribute("type") || "").toLowerCase();
+          if (type === "email" || el.hasAttribute("data-val-email")) {
+            r.email = true;
+            m.email = m.email || el.getAttribute("data-val-email") || "Ingresa un email válido.";
+          }
+
+          if (Object.keys(r).length) {
+            extraRules[name] = r;
+            extraMessages[name] = m;
+          }
+        });
+
+        var v = $form.data("validator") || $form.validate({
+          rules: extraRules,
+          messages: extraMessages,
+          errorClass: "text-danger small",
+          errorElement: "div",
+          highlight: function (el) { el.classList.add("is-invalid"); },
+          unhighlight: function (el) { el.classList.remove("is-invalid"); },
+          errorPlacement: function (error, element) {
+            var $col = element.closest(".col, .col-md-4, .col-md-3, .col-12, .form-group");
+            if ($col.length) $col.append(error); else error.insertAfter(element);
+          }
+        });
+
+        v.settings.onkeyup    = function (el) { $(el).valid(); };
+        v.settings.onfocusout = function (el) { $(el).valid(); };
+        $form.on("input change", "input, textarea, select", function () { $(this).valid(); });
+
+        $form.on("submit", function (e) { if (!$form.valid()) e.preventDefault(); });
+      });
+    })();
+</script>

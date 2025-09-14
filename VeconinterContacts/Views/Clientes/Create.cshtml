@@ -1,0 +1,24 @@
+﻿@model VeconinterContacts.Models.Cliente
+
+@{
+    ViewData["Title"] = "Nuevo Cliente";
+}
+<div class="card">
+    <div class="card-header">Nuevo Cliente</div>
+    <div class="card-body">
+        <form id="createClienteForm" asp-action="Create" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.Partial("_Form", Model)
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary">Guardar</button>
+                <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_FormLiveValidation"
+             view-data='new ViewDataDictionary(ViewData) { { "FormSelector", "#createClienteForm" } }' />
+}
